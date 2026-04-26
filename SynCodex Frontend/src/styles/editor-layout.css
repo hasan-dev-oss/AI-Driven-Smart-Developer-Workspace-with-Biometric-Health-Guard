@@ -1,0 +1,397 @@
+/* Professional Editor Layout */
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--primary-bg);
+}
+
+/* Header / Navigation */
+.editor-header {
+  background-color: var(--secondary-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4rem;
+  flex-shrink: 0;
+  gap: var(--space-lg);
+}
+
+.editor-header-logo {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+}
+
+.editor-header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.editor-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.editor-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--rounded-md);
+  background-color: var(--tertiary-bg);
+  font-size: var(--font-size-sm);
+  color: var(--secondary-text);
+}
+
+/* Main Content Area */
+.editor-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* Sidebar */
+.editor-sidebar {
+  background-color: var(--secondary-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+.editor-sidebar.open {
+  width: 280px;
+}
+
+.editor-sidebar.closed {
+  width: 0;
+}
+
+.sidebar-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.sidebar-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md) 0;
+}
+
+.file-item {
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--secondary-text);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-base);
+  border-left: 2px solid transparent;
+}
+
+.file-item:hover {
+  background-color: var(--hover-bg);
+  color: var(--primary-text);
+}
+
+.file-item.active {
+  background-color: var(--tertiary-bg);
+  border-left-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+/* Editor Content */
+.editor-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-tabs-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--secondary-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0;
+  gap: var(--space-sm);
+  min-height: 2.75rem;
+  overflow-x: auto;
+}
+
+.project-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+  padding: 0 var(--space-md);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.editor-pane-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  padding: var(--space-md) var(--space-md) 0 var(--space-md);
+}
+
+.editor-pane-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  gap: var(--space-md);
+}
+
+.editor-pane-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  border-radius: var(--rounded-md);
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-base);
+}
+
+.editor-pane-main.split-view {
+  flex: 0 1 50%;
+  border-right: none;
+  border-radius: var(--rounded-md) 0 0 var(--rounded-md);
+}
+
+.editor-pane-main.full-width {
+  flex: 1;
+}
+
+.editor-preview-pane {
+  flex: 0 1 50%;
+  overflow: hidden;
+  border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-left: none;
+}
+
+.editor-terminal {
+  flex: 0 0 auto;
+  background-color: var(--primary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--rounded-md);
+  overflow: hidden;
+  margin-top: var(--space-md);
+}
+
+.editor-tabs {
+  display: flex;
+  background-color: var(--secondary-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.editor-tab {
+  padding: var(--space-md);
+  cursor: pointer;
+  color: var(--secondary-text);
+  font-size: var(--font-size-sm);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  position: relative;
+}
+
+.editor-tab:hover {
+  color: var(--primary-text);
+  background-color: var(--hover-bg);
+}
+
+.editor-tab.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.editor-pane {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--tertiary-bg);
+}
+
+.editor-pane-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--tertiary-text);
+  font-size: var(--font-size-lg);
+  text-align: center;
+}
+
+/* Bottom Panel */
+.editor-bottom {
+  background-color: var(--secondary-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  min-height: 200px;
+  transition: all var(--transition-base);
+}
+
+.editor-bottom-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  cursor: grab;
+}
+
+.editor-bottom-header:active {
+  cursor: grabbing;
+}
+
+.terminal-tabs {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.terminal-tab {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--rounded-sm) var(--rounded-sm) 0 0;
+  border: none;
+  background-color: var(--tertiary-bg);
+  color: var(--secondary-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.terminal-tab:hover {
+  background-color: var(--hover-bg);
+}
+
+.terminal-tab.active {
+  background-color: var(--primary-bg);
+  color: var(--accent-primary);
+  border-bottom: 2px solid var(--accent-primary);
+}
+
+.editor-bottom-content {
+  flex: 1;
+  overflow: hidden;
+  background-color: var(--primary-bg);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+}
+
+/* Utilities */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  cursor: pointer;
+  padding: var(--space-sm);
+  transition: color var(--transition-base);
+}
+
+.sidebar-toggle:hover {
+  color: var(--primary-text);
+}
+
+.panel-resize-handle {
+  height: 4px;
+  background-color: var(--border-color);
+  cursor: row-resize;
+  transition: background-color var(--transition-base);
+  user-select: none;
+}
+
+.panel-resize-handle:hover {
+  background-color: var(--accent-primary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.editor-content .fade-in {
+  animation: fadeIn var(--transition-base);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .editor-sidebar.open {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .editor-sidebar {
+    position: absolute;
+    height: 100%;
+    z-index: 50;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .editor-sidebar.open {
+    width: 250px;
+  }
+
+  .editor-header {
+    padding: var(--space-md);
+  }
+
+  .editor-header-center {
+    display: none;
+  }
+}

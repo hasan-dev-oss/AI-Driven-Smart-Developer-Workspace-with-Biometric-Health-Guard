@@ -1,0 +1,88 @@
+/* Professional File Tabs Styling */
+
+.editor-tabs {
+  display: flex;
+  flex: 1;
+  gap: 0;
+  overflow-x: auto;
+  align-items: stretch;
+}
+
+.editor-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  color: var(--secondary-text);
+  font-size: var(--font-size-sm);
+  background-color: transparent;
+  border: none;
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+  transition: all var(--transition-base);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.editor-tab:hover {
+  color: var(--primary-text);
+  background-color: var(--hover-bg);
+}
+
+.editor-tab.active {
+  color: var(--accent-primary);
+  background-color: var(--hover-bg);
+  border-bottom: 2px solid var(--accent-primary);
+}
+
+.editor-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+}
+
+.tab-label {
+  font-weight: var(--font-weight-medium);
+}
+
+.tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+  opacity: 0.7;
+  transition: all var(--transition-base);
+}
+
+.tab-close:hover {
+  color: var(--accent-danger);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Scrollbar styling for tabs container */
+.editor-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.editor-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor-tabs::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.editor-tabs::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}

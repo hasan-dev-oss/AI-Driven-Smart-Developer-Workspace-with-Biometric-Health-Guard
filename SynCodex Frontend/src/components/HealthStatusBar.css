@@ -1,0 +1,44 @@
+.health-status-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 1.25rem;
+}
+
+.health-status-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.health-status-btn:active {
+  transform: scale(0.95);
+}
+
+.health-status-btn.text-green-400 {
+  color: #4ade80;
+}
+
+.health-status-btn.text-yellow-400 {
+  color: #facc15;
+  animation: pulse 2s infinite;
+}
+
+.health-status-btn.text-red-400 {
+  color: #f87171;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
