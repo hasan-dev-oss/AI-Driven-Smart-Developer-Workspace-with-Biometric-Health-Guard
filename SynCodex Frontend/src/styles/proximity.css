@@ -1,0 +1,355 @@
+/* Proximity Detection System Styles */
+
+/* Screen Blur Effect */
+.screen-blur {
+  filter: blur(10px);
+  transition: filter 0.3s ease-in-out;
+  pointer-events: none;
+  user-select: none;
+}
+
+.screen-blur * {
+  pointer-events: none;
+}
+
+/* Remove blur */
+.screen-blur-off {
+  filter: none;
+  transition: filter 0.3s ease-in-out;
+}
+
+/* Proximity Status Indicator */
+.proximity-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(30, 30, 46, 0.9);
+  border: 1px solid rgba(80, 109, 255, 0.3);
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.proximity-status-indicator:hover {
+  background: rgba(30, 30, 46, 1);
+  border-color: rgba(80, 109, 255, 0.6);
+  box-shadow: 0 0 10px rgba(80, 109, 255, 0.2);
+}
+
+/* Status Dot - Detecting */
+.proximity-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse-breathing 2s ease-in-out infinite;
+}
+
+.proximity-status-dot.detecting {
+  background: #94FFF2;
+  box-shadow: 0 0 8px rgba(148, 255, 242, 0.6);
+}
+
+.proximity-status-dot.no-face {
+  background: #FFB800;
+  box-shadow: 0 0 8px rgba(255, 184, 0, 0.4);
+}
+
+.proximity-status-dot.safe {
+  background: #00D4AA;
+  box-shadow: 0 0 8px rgba(0, 212, 170, 0.4);
+}
+
+.proximity-status-dot.alert {
+  background: #FF6B6B;
+  animation: pulse-alert 1s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.8);
+}
+
+.proximity-status-dot.error {
+  background: #999;
+  box-shadow: none;
+}
+
+.proximity-status-dot.disabled {
+  background: #555;
+  opacity: 0.5;
+  animation: none;
+}
+
+/* Status Text */
+.proximity-status-text {
+  color: #94FFF2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.proximity-status-text.safe {
+  color: #00D4AA;
+}
+
+.proximity-status-text.alert {
+  color: #FF6B6B;
+  font-weight: 600;
+}
+
+.proximity-status-text.no-face {
+  color: #FFB800;
+}
+
+.proximity-status-text.error {
+  color: #FF6B6B;
+}
+
+.proximity-status-text.disabled {
+  color: #999;
+  opacity: 0.6;
+}
+
+/* Distance Display */
+.proximity-distance {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Proximity Settings */
+.proximity-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(30, 30, 46, 0.5);
+  border: 1px solid rgba(80, 109, 255, 0.2);
+}
+
+.proximity-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.proximity-settings-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94FFF2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.proximity-settings-description {
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+}
+
+.proximity-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+/* Threshold Slider */
+.proximity-slider {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #506DFF, #94FFF2);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.proximity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #94FFF2;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(148, 255, 242, 0.6);
+  transition: all 0.2s ease;
+}
+
+.proximity-slider::-webkit-slider-thumb:hover {
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 12px rgba(148, 255, 242, 0.8);
+}
+
+.proximity-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #94FFF2;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px rgba(148, 255, 242, 0.6);
+  transition: all 0.2s ease;
+}
+
+.proximity-slider::-moz-range-thumb:hover {
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 12px rgba(148, 255, 242, 0.8);
+}
+
+.proximity-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+.proximity-slider::-moz-range-progress {
+  background: linear-gradient(to right, #506DFF, #94FFF2);
+  height: 4px;
+  border-radius: 2px;
+}
+
+/* Input Fields */
+.proximity-input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgba(61, 65, 90, 0.5);
+  border: 1px solid rgba(148, 255, 242, 0.3);
+  color: #94FFF2;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-family: 'Courier New', monospace;
+}
+
+.proximity-input:focus {
+  outline: none;
+  border-color: #94FFF2;
+  background: rgba(61, 65, 90, 0.8);
+  box-shadow: 0 0 8px rgba(148, 255, 242, 0.2);
+}
+
+/* Toggle Switch */
+.proximity-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.proximity-toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: rgba(80, 109, 255, 0.3);
+  border-radius: 11px;
+  transition: background 0.3s ease;
+  border: 1px solid rgba(80, 109, 255, 0.5);
+}
+
+.proximity-toggle-switch.active {
+  background: rgba(148, 255, 242, 0.3);
+  border-color: #94FFF2;
+}
+
+.proximity-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: rgba(80, 109, 255, 0.8);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 4px rgba(80, 109, 255, 0.4);
+}
+
+.proximity-toggle-switch.active .proximity-toggle-knob {
+  left: 20px;
+  background: #94FFF2;
+  box-shadow: 0 0 8px rgba(148, 255, 242, 0.6);
+}
+
+/* Camera Hidden Video */
+.proximity-camera-video {
+  display: none;
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  bottom: -100%;
+  right: -100%;
+  opacity: 0;
+}
+
+/* Proximity Alert Animation */
+@keyframes pulse-alert {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes pulse-breathing {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Proximity Alert Badge */
+.proximity-alert-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  background: rgba(255, 107, 107, 0.95);
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+  z-index: 1000;
+  animation: slide-in 0.3s ease;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .proximity-status-indicator {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .proximity-settings {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .proximity-alert-badge {
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+  }
+}
