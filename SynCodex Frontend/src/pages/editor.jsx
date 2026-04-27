@@ -12,6 +12,7 @@ import useMeta from "../hooks/useMeta";
 import TerminalComponent from "../components/terminal/TerminalComponent";
 import { useFlowTracker } from "../hooks/useFlowTracker";
 import { useHealthTracker } from "../hooks/useHealthTracker";
+import ProximityDetectionProvider from "../components/editor/ProximityDetectionProvider";
 
 export default function EditorPage() {
   useMeta();
@@ -29,6 +30,7 @@ export default function EditorPage() {
   const resizeStartYRef = useRef(0);
   const resizeStartHeightRef = useRef(0);
   const editorRef = useRef(null);
+  const editorContainerRef = useRef(null);
 
   const { projectId } = useParams();
 
@@ -122,17 +124,18 @@ export default function EditorPage() {
   }, [isResizingTerminal]);
 
   return (
-    <div className="editor-container">
-      <EditorNav
-        onRunClick={handleRunClick}
-        onPreviewClick={handlePreviewClick}
-        isHtmlFile={!!isHtmlFile}
-        flowStatus={statusIcon}
-        healthData={healthData}
-      />
+    <ProximityDetectionProvider containerRef={editorContainerRef}>
+      <div className="editor-container" ref={editorContainerRef}>
+        <EditorNav
+          onRunClick={handleRunClick}
+          onPreviewClick={handlePreviewClick}
+          isHtmlFile={!!isHtmlFile}
+          flowStatus={statusIcon}
+          healthData={healthData}
+        />
 
-      <div className="editor-main">
-        <nav className={`editor-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+        <div className="editor-main">
+          <nav className={`editor-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
           {isSidebarOpen && (
             <FileExplorer
               openFiles={openFiles}
@@ -208,8 +211,9 @@ export default function EditorPage() {
               </>
             )}
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </ProximityDetectionProvider>
   );
 }

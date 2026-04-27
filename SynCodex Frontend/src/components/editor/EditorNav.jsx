@@ -1,8 +1,19 @@
-import { Play, PlayCircle } from "lucide-react";
+import { Play, Video, VideoOff } from "lucide-react";
 import { VscOpenPreview } from "react-icons/vsc";
 import HealthStatusBar from "../HealthStatusBar";
+import ProximityStatusIndicator from "./ProximityStatusIndicator";
 
-export default function EditorNav({ onRunClick, onPreviewClick, isHtmlFile, flowStatus, healthData }) {
+export default function EditorNav({
+  onRunClick,
+  onPreviewClick,
+  isHtmlFile,
+  flowStatus,
+  healthData,
+  isDemoMode,
+  onToggleDemo,
+  showVideoPanel,
+  onToggleVideoPanel,
+}) {
   return (
     <header className="h-12 shrink-0 bg-[#181a1f] border-b border-[#2d2d2d] flex items-center justify-between px-5 select-none z-50 shadow-sm relative">
       
@@ -46,7 +57,37 @@ export default function EditorNav({ onRunClick, onPreviewClick, isHtmlFile, flow
       </div>
 
       {/* Right Region: Integration Hooks */}
-      <div className="flex items-center justify-end min-w-[200px] gap-4">
+      <div className="flex items-center justify-end min-w-[300px] gap-3">
+        <ProximityStatusIndicator />
+        {onToggleVideoPanel && (
+          <button
+            onClick={onToggleVideoPanel}
+            title={showVideoPanel ? "Hide video panel" : "Show video panel"}
+            type="button"
+            className={`flex items-center gap-2 px-3 py-[5px] rounded text-[12px] font-semibold transition-all border ${
+              showVideoPanel
+                ? "bg-[#1f2a3a] text-gray-200 border-white/10 hover:border-white/20"
+                : "bg-transparent text-gray-300 border-white/10 hover:border-white/20 hover:text-white"
+            }`}
+          >
+            {showVideoPanel ? <Video size={14} /> : <VideoOff size={14} />}
+            {showVideoPanel ? "Hide Call" : "Show Call"}
+          </button>
+        )}
+        {onToggleDemo && (
+          <button
+            onClick={onToggleDemo}
+            title={isDemoMode ? "Switch to 20-minute mode" : "Switch to 2-second demo"}
+            type="button"
+            className={`flex items-center gap-2 px-3 py-[5px] rounded text-[12px] font-semibold transition-all border ${
+              isDemoMode
+                ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40 hover:bg-indigo-500/30"
+                : "bg-transparent text-gray-300 border-white/10 hover:border-white/20 hover:text-white"
+            }`}
+          >
+            {isDemoMode ? "Demo active" : "Try Demo"}
+          </button>
+        )}
         {healthData && (
           <div className="bg-[#161b22] border border-white/5 rounded-md px-3 py-1 flex items-center shadow-inner hover:border-white/10 transition-colors">
             <HealthStatusBar healthData={healthData} />
