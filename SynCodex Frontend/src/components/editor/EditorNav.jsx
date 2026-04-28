@@ -1,7 +1,8 @@
-import { Play, Video, VideoOff } from "lucide-react";
+import { Play, Video, VideoOff, Mic } from "lucide-react";
 import { VscOpenPreview } from "react-icons/vsc";
 import HealthStatusBar from "../HealthStatusBar";
 import ProximityStatusIndicator from "./ProximityStatusIndicator";
+import { useState } from "react";
 
 export default function EditorNav({
   onRunClick,
@@ -13,6 +14,7 @@ export default function EditorNav({
   onToggleDemo,
   showVideoPanel,
   onToggleVideoPanel,
+  onInterviewClick,
 }) {
   return (
     <header className="h-12 shrink-0 bg-[#181a1f] border-b border-[#2d2d2d] flex items-center justify-between px-5 select-none z-50 shadow-sm relative">
@@ -59,6 +61,17 @@ export default function EditorNav({
       {/* Right Region: Integration Hooks */}
       <div className="flex items-center justify-end min-w-[300px] gap-3">
         <ProximityStatusIndicator />
+        {onInterviewClick && (
+          <button
+            onClick={onInterviewClick}
+            title="Start Interview Recording"
+            type="button"
+            className="flex items-center gap-2 px-3 py-[5px] bg-green-500/15 hover:bg-green-500/25 text-green-400 hover:text-green-300 border border-green-500/30 hover:border-green-500/50 rounded text-[12px] font-semibold transition-all"
+          >
+            <Mic size={14} />
+            Interview
+          </button>
+        )}
         {onToggleVideoPanel && (
           <button
             onClick={onToggleVideoPanel}

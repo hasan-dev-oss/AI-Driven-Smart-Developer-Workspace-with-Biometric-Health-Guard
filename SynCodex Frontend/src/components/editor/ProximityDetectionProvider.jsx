@@ -1,6 +1,10 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useRef, useState, useEffect, useCallback } from 'react';
 import { useProximityDetection } from '../../hooks/useProximityDetection';
 import { useUser } from '../../context/UserContext';
+
+const ProximityDetectionContext = createContext(null);
+
+export const useProximityDetectionContext = () => useContext(ProximityDetectionContext);
 
 /**
  * ProximityDetectionProvider Component
@@ -86,7 +90,18 @@ const ProximityDetectionProvider = ({ children, containerRef }) => {
   }, [containerRef]);
 
   return (
-    <>
+    <ProximityDetectionContext.Provider
+      value={{
+        currentDistance,
+        faceDetected,
+        error,
+        isSupported,
+        distanceInCm,
+        isEnabled: proximitySettings.proximityEnabled,
+        threshold: proximitySettings.proximityThreshold,
+        unit: proximitySettings.distanceUnit,
+      }}
+    >
       {/* Hidden video element for camera feed */}
       <video
         ref={videoRef}
@@ -99,7 +114,7 @@ const ProximityDetectionProvider = ({ children, containerRef }) => {
 
       {/* Render children with proximity context */}
       {children}
-    </>
+    </ProximityDetectionContext.Provider>
   );
 };
 

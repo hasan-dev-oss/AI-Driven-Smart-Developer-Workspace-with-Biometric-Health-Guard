@@ -13,6 +13,7 @@ import TerminalComponent from "../components/terminal/TerminalComponent";
 import { useFlowTracker } from "../hooks/useFlowTracker";
 import { useHealthTracker } from "../hooks/useHealthTracker";
 import ProximityDetectionProvider from "../components/editor/ProximityDetectionProvider";
+import InterviewRecorder from "../components/interview/InterviewRecorder";
 
 export default function EditorPage() {
   useMeta();
@@ -27,6 +28,7 @@ export default function EditorPage() {
   const [isTerminalVisible, setIsTerminalVisible] = useState(true);
   const [terminalHeight, setTerminalHeight] = useState(260);
   const [isResizingTerminal, setIsResizingTerminal] = useState(false);
+  const [showInterviewRecorder, setShowInterviewRecorder] = useState(false);
   const resizeStartYRef = useRef(0);
   const resizeStartHeightRef = useRef(0);
   const editorRef = useRef(null);
@@ -132,6 +134,7 @@ export default function EditorPage() {
           isHtmlFile={!!isHtmlFile}
           flowStatus={statusIcon}
           healthData={healthData}
+          onInterviewClick={() => setShowInterviewRecorder(true)}
         />
 
         <div className="editor-main">
@@ -213,6 +216,9 @@ export default function EditorPage() {
           </div>
           </div>
         </div>
+        {showInterviewRecorder && (
+          <InterviewRecorder onClose={() => setShowInterviewRecorder(false)} />
+        )}
       </div>
     </ProximityDetectionProvider>
   );

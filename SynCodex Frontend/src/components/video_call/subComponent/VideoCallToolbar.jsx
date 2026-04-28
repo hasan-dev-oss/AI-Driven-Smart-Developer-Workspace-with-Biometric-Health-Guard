@@ -2,7 +2,25 @@ import IconButton from "../../IconButton";
 import AppColors from "../../../utils/appColors";
 import AppIcons from "../../../utils/appIcons";
 
-const VideoCallToolbar = ({micDisable,camDisable,speakerOff, toggleMic,toggleCam,toggleSpeaker,toggleEndCall,toggleMore }) => {
+const VideoCallToolbar = ({
+  micDisable,
+  camDisable,
+  speakerOff,
+  isCallActive,
+  onStartCall,
+  onEndCall,
+  onCloseScreen,
+  toggleMic,
+  toggleCam,
+  toggleSpeaker,
+  onInterviewToggle,
+  interviewActive,
+}) => {
+  const stopBubbling = (handler) => (event) => {
+    event?.stopPropagation?.();
+    handler?.();
+  };
+
   return (
      <div className="flex flex-col justify-end items-center pt-1 sm:pt-1.5 md:pt-2 lg:pt-3 h-full">
       <div
@@ -34,17 +52,38 @@ const VideoCallToolbar = ({micDisable,camDisable,speakerOff, toggleMic,toggleCam
             onClick={toggleCam}
             label={camDisable ? "Camera OFF" : "Camera ON"}
           />
+
+          {/* Interview button: room-level control to open AI Assistant / start interview flow */}
+          {onInterviewToggle && (
+            <IconButton
+              icon={AppIcons.enabledAudio}
+              buttonColor={interviewActive ? AppColors.redColor : 'bg-green-600'}
+              onClick={stopBubbling(onInterviewToggle)}
+              label={interviewActive ? 'Stop Interview' : 'Interview'}
+            />
+          )}
+
+          {!isCallActive && (
+            <IconButton
+              icon={AppIcons.enabledAudio}
+              buttonColor={AppColors.container}
+              onClick={stopBubbling(onStartCall)}
+              label="Start Call"
+            />
+          )}
+          {isCallActive && (
+            <IconButton
+              icon={AppIcons.callEnd}
+              buttonColor={AppColors.redColor}
+              onClick={stopBubbling(onEndCall)}
+              label="End Call"
+            />
+          )}
           <IconButton
             icon={AppIcons.moreHorizontal}
             buttonColor={AppColors.buttonColor}
-            onClick={toggleMore}
-            label="More"
-          />
-          <IconButton
-            icon={AppIcons.callEnd}
-            buttonColor={AppColors.redColor}
-            onClick={toggleEndCall}
-            label="End Call"
+            onClick={stopBubbling(onCloseScreen)}
+            label="Close Screen"
           />
         </div>
       </div>

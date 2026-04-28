@@ -138,13 +138,20 @@ export const FileExplorer = ({
       }));
       const tree = convertToTree(folders);
       setFileTree(tree);
+
+      if (tree.length > 0) {
+        const hasSelected = tree.some((folder) => folder.name === selectedFolderForFile);
+        if (!selectedFolderForFile || !hasSelected) {
+          setSelectedFolderForFile(tree[0].name);
+        }
+      }
     };
 
     yFoldersMap.observeDeep(updateFolders);
     updateFolders();
 
     return () => yFoldersMap.unobserveDeep(updateFolders);
-  }, [isCollab, yFoldersMap, convertToTree, setFileTree]);
+  }, [isCollab, yFoldersMap, convertToTree, setFileTree, selectedFolderForFile]);
 
   // Validation functions
   const validateFileName = (name) => {
@@ -185,6 +192,14 @@ export const FileExplorer = ({
   };
 
   const handleAddFile = () => {
+    if (!fileTree.length) {
+      setValidationError("Create a folder first");
+      setCreationMode("folder");
+      return;
+    }
+    if (!selectedFolderForFile) {
+      setSelectedFolderForFile(fileTree[0].name);
+    }
     setCreationMode("file");
     setNewName("");
     setValidationError("");
@@ -644,6 +659,12 @@ export const FileExplorer = ({
         projectId={roomOrProjectId}
         onFileCreate={(type, parentId) => {
           if (type === "file") {
+            if (parentId) {
+              const folder = fileTree.find((node) => node.id === parentId);
+              if (folder?.name) {
+                setSelectedFolderForFile(folder.name);
+              }
+            }
             handleAddFile();
           } else {
             handleAddFolder();

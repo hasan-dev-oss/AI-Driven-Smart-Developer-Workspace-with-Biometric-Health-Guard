@@ -37,12 +37,13 @@ export const CollabEditorPane = forwardRef(
     }));
 
     useEffect(() => {
-      if (!activeFile) return;
+      if (!activeFile || !yText) return;
 
-      const storedContent = fileStorageKey
-        ? localStorage.getItem(fileStorageKey)
-        : "";
-      setValue(storedContent || "");
+      const storedContent = fileStorageKey ? localStorage.getItem(fileStorageKey) : "";
+      const yContent = yText.toString();
+      const nextValue = yContent && yContent.length > 0 ? yContent : storedContent || "";
+
+      setValue(nextValue);
       setSaveStatus("idle");
 
       if (editorRef.current) {
@@ -59,10 +60,9 @@ export const CollabEditorPane = forwardRef(
             new Set([editorRef.current]),
             provider ? provider.awareness : null
           );
-          console.log(`Bound Monaco to Y.Text for file: ${activeFile}`);
         }
       }
-    }, [activeFile, fileStorageKey, yDoc, yText]);
+    }, [activeFile, fileStorageKey, yText, provider]);
 
     const saveLocalDraft = useMemo(
       () =>
@@ -206,13 +206,21 @@ export const CollabEditorPane = forwardRef(
       if (bindingRef.current) bindingRef.current.destroy();
 
       if (yText) {
+        const yContent = yText.toString();
+        if (yContent && yContent.length > 0) {
+          const model = editor.getModel();
+          if (model && model.getValue() !== yContent) {
+            model.setValue(yContent);
+          }
+          setValue(yContent);
+        }
+
         bindingRef.current = new MonacoBinding(
           yText,
           editor.getModel(),
           new Set([editor]),
           provider ? provider.awareness : null
         );
-        console.log(`Bound Monaco to Y.Text for file: ${activeFile}`);
       }
     };
 

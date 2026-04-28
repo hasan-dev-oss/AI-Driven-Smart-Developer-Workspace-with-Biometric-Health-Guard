@@ -15,6 +15,8 @@ import useEyeCareTimer from "../../hooks/useEyeCareTimer";
 import EyeCareOverlay from "../EyeCareOverlay";
 import EyeCareWidget from "../EyeCareWidget";
 import SystemHealthWidget from "../SystemHealthWidget";
+import AIAssistantSidebar from "../interview/AIAssistantSidebar";
+import InterviewRecorder from "../interview/InterviewRecorder";
 export default function CollabEditorLayout({ roomId, isInterviewMode }) {
   const [openFiles, setOpenFiles] = useState([]);
   const [activeFile, setActiveFile] = useState(null);
@@ -26,6 +28,9 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
   const [showOutput, setShowOutput] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [localStreamForAI, setLocalStreamForAI] = useState(null);
+  const [showInterviewRecorder, setShowInterviewRecorder] = useState(false);
 
   // --- Eye Care Timer Integration ---
   const { 
@@ -84,6 +89,20 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
   useEffect(() => {
     setShowPreview(false);
   }, [activeFile?.name]);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const aiKey = `ai_panel_opened_${roomId}`;
+    if (!sessionStorage.getItem(aiKey)) {
+      setAiOpen(true);
+      sessionStorage.setItem(aiKey, "1");
+    }
+    const interviewKey = `interview_modal_opened_${roomId}`;
+    if (!sessionStorage.getItem(interviewKey)) {
+      setShowInterviewRecorder(true);
+      sessionStorage.setItem(interviewKey, "1");
+    }
+  }, [roomId]);
 
   const handlePreviewClick = () => setShowPreview((prev) => !prev);
   const handleClosePreview = () => setShowPreview(false);
@@ -193,12 +212,23 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
                 </span>
               )}
 
-              <FileTabs
-                openFiles={openFiles}
-                activeFile={activeFile}
-                setActiveFile={setActiveFile}
-                setOpenFiles={setOpenFiles}
-              />
+              <div className="flex items-center w-full">
+                <FileTabs
+                  openFiles={openFiles}
+                  activeFile={activeFile}
+                  setActiveFile={setActiveFile}
+                  setOpenFiles={setOpenFiles}
+                />
+                <div className="ml-auto pr-4">
+                  <button
+                    onClick={() => setAiOpen((v) => !v)}
+                    className={`flex items-center gap-2 text-sm ${aiOpen ? 'hidden' : 'bg-[#3D415A] text-white px-3 py-1 rounded-md ml-4'}`}
+                    aria-pressed={aiOpen}
+                  >
+                    AI Assistant
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Editor and Video Call Section */}
@@ -248,14 +278,21 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
                   width: isInterviewMode ? "auto" : "30%",
                   flexShrink: 0,
                   transition: isInterviewMode ? "none" : "width 0.3s ease",
+                  display: 'flex'
                 }}
               >
-                <SocketProvider>
-                  <VideoCallSection
-                    roomIdVCS={roomId}
-                    isInterviewMode={isInterviewMode}
-                  />
-                </SocketProvider>
+                <div style={{flex: 1}}>
+                  <SocketProvider>
+                    <VideoCallSection
+                      roomIdVCS={roomId}
+                      isInterviewMode={isInterviewMode}
+                      onLocalStreamChange={(s) => setLocalStreamForAI(s)}
+                      onInterviewToggle={() => setAiOpen((v) => !v)}
+                      aiOpen={aiOpen}
+                    />
+                  </SocketProvider>
+                </div>
+                <AIAssistantSidebar mediaStream={localStreamForAI} roomId={roomId} open={aiOpen} onToggle={() => setAiOpen((v) => !v)} />
               </div>
             </div>
           </div>
@@ -288,6 +325,13 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
           </div>
         </div>
       </div>
+      {showInterviewRecorder && (
+        <InterviewRecorder
+          onClose={() => setShowInterviewRecorder(false)}
+          roomId={roomId}
+          roomName={sessionName}
+        />
+      )}
     </>
   );
 }

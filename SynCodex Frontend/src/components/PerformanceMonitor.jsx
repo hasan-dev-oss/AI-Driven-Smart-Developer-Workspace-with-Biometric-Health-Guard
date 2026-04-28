@@ -107,7 +107,7 @@ const PerformanceMonitorComponent = ({ metrics = [], isConnected = true, error =
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
+    <div className="w-full h-full min-h-105 flex flex-col bg-linear-to-br from-gray-950 via-gray-900 to-gray-950 border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-900/50 backdrop-blur">
         <div className="flex items-center gap-3">
@@ -178,7 +178,7 @@ const PerformanceMonitorComponent = ({ metrics = [], isConnected = true, error =
       </div>
 
       {/* Chart Container */}
-      <div className="flex-1 px-6 py-4 min-h-0" style={{ height: "100%", width: "100%" }}>
+      <div className="flex-1 px-6 py-4 min-h-60 overflow-hidden" style={{ height: "auto", minHeight: "250px", width: "100%" }}>
         {error && (
           <div className="flex items-center justify-center h-full">
             <p className="text-red-400 text-sm">{error}</p>

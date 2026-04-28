@@ -59,7 +59,7 @@ npm run dev
 #### 3. Backend Setup (`SynCodex Backend`)
 
 ```bash
-cd "../SynCodex Backend"
+cd "SynCodex Backend"
 npm install
 npm start
 ```
@@ -110,3 +110,6 @@ This project is **actively under development**. Features and documentation are s
 cd '/home/azeem/Documents/Year3 -Sem 2/SynCodex-main/code runner/app' && '/home/azeem/Documents/Year3 -Sem 2/SynCodex-main/.venv/bin/python' app.py
 
 
+Camera Permission Denied - Video call and proximity detection are blocked
+WebSocket Connection Failures - Y.js signaling servers aren't connecting (likely network/environment issue)
+Recharts Chart Sizing - Chart dimensions showing -1 (sizing problem)

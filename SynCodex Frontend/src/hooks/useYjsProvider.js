@@ -40,15 +40,28 @@ export const useYjsProvider = (roomId) => {
             password: 'securesphere-p2p' // End-to-End Encryption Key
         });
 
-        docState = { doc, provider: webrtcProvider, indexeddbProvider, connections: 0 };
+        docState = { doc, provider: webrtcProvider, indexeddbProvider, connections: 0, cleanupTimer: null };
         documentCache.set(roomId, docState);
     }
-    
+
+    if (docState.cleanupTimer) {
+      clearTimeout(docState.cleanupTimer);
+      docState.cleanupTimer = null;
+    }
+
     docState.connections++;
 
     // 4. Implement Phase 1: Remote Cursor Awareness (The "Figma" Factor)
     const rawData = localStorage.getItem("synSession");
-    const email = localStorage.getItem("email") || "Anonymous Dev";
+    const emailFull = localStorage.getItem("email") || "anonymous@syncodex.local";
+    const userId = emailFull;
+    const displayName = emailFull.includes("@") ? emailFull.split("@")[0] : emailFull;
+
+    const colorKey = "synPresenceColor";
+    const persistedColor = localStorage.getItem(colorKey);
+    const color = persistedColor || getRandomDevColor();
+    if (!persistedColor) localStorage.setItem(colorKey, color);
+
     let sessionName = "Unnamed Session";
 
     if (rawData) {
@@ -62,8 +75,9 @@ export const useYjsProvider = (roomId) => {
     // Set globally synced Awareness fields asynchronously into the CRDT ephemeral mesh
     docState.provider.awareness.setLocalStateField("sessionInfo", { name: sessionName });
     docState.provider.awareness.setLocalStateField("user", {
-        name: email.split("@")[0], // Use email prefix as Dev Name for cursors
-        color: getRandomDevColor()
+      id: userId,
+      name: displayName,
+      color,
     });
 
     if (mountRef.current) {
@@ -75,10 +89,16 @@ export const useYjsProvider = (roomId) => {
       mountRef.current = false;
       const cached = documentCache.get(roomId);
       if (cached) {
-          cached.connections--;
-          // To ensure flawless tab-switching, we do NOT instantly destroy the connection. 
-          // Future garbage collection can occur here, but for now we preserve the stream alive.
-          console.log(`⚠️ Component Unmounted. Preserving y-webrtc stream for ${roomId}.`);
+        cached.connections--;
+
+        if (cached.connections <= 0) {
+          cached.cleanupTimer = setTimeout(() => {
+            try { cached.provider?.destroy?.(); } catch {}
+            try { cached.indexeddbProvider?.destroy?.(); } catch {}
+            try { cached.doc?.destroy?.(); } catch {}
+            documentCache.delete(roomId);
+          }, 60_000);
+        }
       }
     };
   }, [roomId]);

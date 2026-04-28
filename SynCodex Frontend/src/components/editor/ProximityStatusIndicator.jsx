@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useProximityDetection } from '../../hooks/useProximityDetection';
 import { useUser } from '../../context/UserContext';
-import { Camera, AlertCircle, CheckCircle, Eye } from 'lucide-react';
+import { useProximityDetectionContext } from './ProximityDetectionProvider';
 
 /**
  * ProximityStatusIndicator Component
@@ -12,16 +12,18 @@ import { Camera, AlertCircle, CheckCircle, Eye } from 'lucide-react';
  * - Alert when too close
  * - Distance unit indicator
  */
-const ProximityStatusIndicator = () => {
+const ProximityStatusIndicatorCore = ({ data }) => {
   const { proximitySettings } = useUser();
   const [statusText, setStatusText] = useState('Initializing...');
   const [statusDot, setStatusDot] = useState('disabled');
 
-  const { currentDistance, faceDetected, error, isSupported, distanceInCm } =
-    useProximityDetection({
-      distanceThreshold: proximitySettings.proximityThreshold,
-      enabled: proximitySettings.proximityEnabled,
-    });
+  const {
+    currentDistance,
+    faceDetected,
+    error,
+    isSupported,
+    distanceInCm,
+  } = data;
 
   // Format distance based on unit setting
   const formatDistance = (distance) => {
@@ -84,6 +86,23 @@ const ProximityStatusIndicator = () => {
       </div>
     </div>
   );
+};
+
+const StandaloneProximityStatusIndicator = () => {
+  const { proximitySettings } = useUser();
+  const hookData = useProximityDetection({
+    distanceThreshold: proximitySettings.proximityThreshold,
+    enabled: proximitySettings.proximityEnabled,
+  });
+  return <ProximityStatusIndicatorCore data={hookData} />;
+};
+
+const ProximityStatusIndicator = () => {
+  const contextData = useProximityDetectionContext();
+  if (contextData) {
+    return <ProximityStatusIndicatorCore data={contextData} />;
+  }
+  return <StandaloneProximityStatusIndicator />;
 };
 
 export default ProximityStatusIndicator;
