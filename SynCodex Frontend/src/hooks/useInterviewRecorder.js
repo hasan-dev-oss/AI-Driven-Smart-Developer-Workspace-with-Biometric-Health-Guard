@@ -46,7 +46,8 @@ export function useInterviewRecorder() {
 
       audioServiceRef.current = new AudioCaptureService(
         (chunk) => handleAudioChunk(chunk),
-        (error) => interview.setError(error)
+        (error) => interview.setError(error),
+        { chunkDuration: 15000 }
       );
 
       const initialized = await audioServiceRef.current.initialize();
@@ -77,7 +78,8 @@ export function useInterviewRecorder() {
         // Send to analysis service
         if (analysisServiceRef.current) {
           const transcript = await analysisServiceRef.current.analyzeAudioChunk(
-            chunk.audio
+            chunk.audio,
+            chunk.mimeType
           );
           if (transcript) {
             interview.appendTranscript(transcript);

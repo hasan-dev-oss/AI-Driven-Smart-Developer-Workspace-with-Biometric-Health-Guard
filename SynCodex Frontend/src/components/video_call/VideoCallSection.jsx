@@ -186,14 +186,11 @@ const VideoCallSection = ({ roomIdVCS, isInterviewMode, onLocalStreamChange, onI
   };
 
   useEffect(() => {
-    if (!socket || !roomIdVCS) return;
-    handleStartCall();
-
     return () => {
       unregisterSocketHandlers();
       cleanupMedia(false);
     };
-  }, [roomIdVCS, socket]);
+  }, []);
 
   const createPeer = async (targetId, isCaller, remoteSdp = null) => {
     if (!localStream.current) return;
@@ -270,6 +267,11 @@ const VideoCallSection = ({ roomIdVCS, isInterviewMode, onLocalStreamChange, onI
         <div className="rounded-xl border border-red-300 bg-red-50 text-red-900 p-3 mb-3">
           <p className="font-semibold">Camera / Microphone Permission Required</p>
           <p>{callError}</p>
+        </div>
+      )}
+      {!isCallActive && (
+        <div className="rounded-xl border border-white/10 bg-white/5 text-slate-300 p-3 mb-3">
+          Click the <strong>Join Session</strong> button in the call toolbar below when you are ready to enter the room.
         </div>
       )}
       {/* Video Screen's */}

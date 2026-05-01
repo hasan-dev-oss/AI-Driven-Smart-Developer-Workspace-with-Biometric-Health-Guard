@@ -46,13 +46,22 @@ const AIAssistantSidebar = ({ mediaStream, roomId, open = true, onToggle }) => {
     try {
       if (!analysisServiceRef.current || !chunk?.audio) return;
       if (chunk.final) return; // skip final merged chunk (we stream per-chunk)
-      const chunkText = await analysisServiceRef.current.analyzeAudioChunk(chunk.audio);
+      const chunkText = await analysisServiceRef.current.analyzeAudioChunk(chunk.audio, chunk.mimeType);
       if (chunkText) {
         setPartialTranscripts((p) => [...p, { text: chunkText, timestamp: chunk.timestamp }]);
         setTranscript((t) => (t ? t + "\n" + chunkText : chunkText));
       }
     } catch (err) {
       console.error("Chunk analysis failed", err);
+      if (err?.status === 429) {
+        const s = err?.retryAfterMs ? Math.ceil(err.retryAfterMs / 1000) : null;
+        setError(
+          s
+            ? `Gemini rate limit reached. Retrying in ~${s}s. (Tip: increase chunk duration or upgrade billing)`
+            : "Gemini rate limit reached. Please wait and try again."
+        );
+        return;
+      }
       setError(err.message || "Chunk analysis failed");
     }
   };
@@ -68,7 +77,8 @@ const AIAssistantSidebar = ({ mediaStream, roomId, open = true, onToggle }) => {
       audioServiceRef.current = new AudioCaptureService(handleChunk, (e) => setError(e));
       const ok = await audioServiceRef.current.initialize(mediaStream);
       if (!ok) throw new Error("Failed to initialize audio capture");
-      audioServiceRef.current.start();
+      const started = audioServiceRef.current.start();
+      if (!started) throw new Error("Failed to start recording");
       setIsRecording(true);
     } catch (err) {
       console.error("Failed to start recording", err);

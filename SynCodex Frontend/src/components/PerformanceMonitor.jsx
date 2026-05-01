@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import ResourceAllocationPanel from './ResourceAllocationPanel';
 
 /**
  * PerformanceMonitor Component
@@ -121,7 +122,7 @@ const PerformanceMonitorComponent = ({ metrics = [], isConnected = true, error =
               <div className="absolute inset-0 w-3 h-3 rounded-full bg-red-500 animate-pulse opacity-50" />
             )}
           </div>
-          <h2 className="text-lg font-bold text-gray-100">System Monitor (DEBUG)</h2>
+          <h2 className="text-lg font-bold text-gray-100">System Monitor & Resource Allocation</h2>
         </div>
 
         {/* Status Indicator */}
@@ -178,19 +179,19 @@ const PerformanceMonitorComponent = ({ metrics = [], isConnected = true, error =
       </div>
 
       {/* Chart Container */}
-      <div className="flex-1 px-6 py-4 min-h-60 overflow-hidden" style={{ height: "auto", minHeight: "250px", width: "100%" }}>
+      <div className="flex-1 px-6 py-4 min-h-60 overflow-hidden flex flex-col" style={{ minHeight: "250px", width: "100%" }}>
         {error && (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center flex-1">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
         {metrics.length === 0 && !error ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center flex-1">
             <p className="text-gray-400 text-sm">Waiting for metrics...</p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minHeight={250}>
             <LineChart data={metrics} margin={{ top: 5, right: 15, left: 0, bottom: 5 }}>
               <defs>
                 <linearGradient id="cpuGradient" x1="0" y1="0" x2="0" y2="1">
@@ -269,6 +270,12 @@ const PerformanceMonitorComponent = ({ metrics = [], isConnected = true, error =
           </ResponsiveContainer>
         )}
       </div>
+
+      <ResourceAllocationPanel
+        currentCPU={currentMetrics.cpu}
+        currentMem={currentMetrics.memory}
+        isThrottled={isThrottled}
+      />
 
       {/* Alert Animation */}
       {alertActive && (

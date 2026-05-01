@@ -68,7 +68,7 @@ const VideoCallToolbar = ({
               icon={AppIcons.enabledAudio}
               buttonColor={AppColors.container}
               onClick={stopBubbling(onStartCall)}
-              label="Start Call"
+              label="Join Session"
             />
           )}
           {isCallActive && (

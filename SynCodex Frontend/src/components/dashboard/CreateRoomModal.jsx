@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
-import { X, UserPlus, Copy } from "lucide-react";
+import { X, Plus, Copy, Users, Loader, CheckCircle } from "lucide-react";
 import ToggleButton from "../toggleButton";
+import InterviewRecorder from "../interview/InterviewRecorder";
 import axios from "axios";
 
 export default function CreateRoomModal({ onClose }) {
@@ -14,6 +15,8 @@ export default function CreateRoomModal({ onClose }) {
   const roomIdRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
+  const [showInterviewRecorder, setShowInterviewRecorder] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
 
   const handleRoomCreation = async () => {
     if (!sessionName.trim()) {
@@ -53,7 +56,7 @@ export default function CreateRoomModal({ onClose }) {
               },
             })
           );
-          window.open("/interview-guidelines", "_blank");
+          setShowInterviewRecorder(true);
         } else {
           localStorage.setItem(
             "collabActions",
@@ -101,96 +104,162 @@ export default function CreateRoomModal({ onClose }) {
     generateRoomId();
   }, [generateRoomId]);
 
+  if (showInterviewRecorder) {
+    return (
+      <InterviewRecorder 
+        roomId={roomId}
+        roomName={sessionName}
+        onClose={() => {
+          setShowInterviewRecorder(false);
+          onClose();
+        }} 
+      />
+    );
+  }
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#00000093]">
-      <div className="bg-[#3D415A] p-6 rounded-2xl shadow-4xl w-94 text-white">
-        <div className="flex items-center gap-10 justify-end">
-          <h2 className="text-2xl font-Chakra font-bold mb-4 ml-10">
-            Create New Room
-          </h2>
-          <button className="p-2rounded mb-4 cursor-pointer" onClick={onClose}>
-            <X size={25} />
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700/50">
+        
+        {/* Header */}
+        <div className="relative px-8 pt-8 pb-6 border-b border-slate-700/30">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
+                <Plus size={24} className="text-cyan-400" />
+                Create Room
+              </h2>
+              <p className="text-sm text-slate-400">Start a new collaboration session</p>
+            </div>
+            <button 
+              onClick={onClose}
+              className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors text-slate-400 hover:text-white"
+            >
+              <X size={22} />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-8 py-6 space-y-6">
+
+          {/* Session Name */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-3">
+              Session Name
+            </label>
+            <input
+              className={`w-full px-4 py-3 bg-slate-700/40 text-white rounded-lg border transition-all focus:outline-none ${
+                focusedField === 'name' 
+                  ? 'border-cyan-500/50 ring-2 ring-cyan-500/30' 
+                  : 'border-slate-600/50 focus:border-cyan-500/50'
+              }`}
+              type="text"
+              placeholder="e.g., Q2 Sprint Planning"
+              value={sessionName}
+              onFocus={() => setFocusedField('name')}
+              onBlur={() => setFocusedField(null)}
+              onChange={(e) => setSessionName(e.target.value)}
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-3">
+              Description <span className="text-slate-500 font-normal">(optional)</span>
+            </label>
+            <textarea
+              value={sessionDescription}
+              onFocus={() => setFocusedField('desc')}
+              onBlur={() => setFocusedField(null)}
+              onChange={(e) => setSessionDescription(e.target.value)}
+              className={`w-full px-4 py-3 bg-slate-700/40 text-white rounded-lg border transition-all focus:outline-none resize-none ${
+                focusedField === 'desc'
+                  ? 'border-cyan-500/50 ring-2 ring-cyan-500/30'
+                  : 'border-slate-600/50 focus:border-cyan-500/50'
+              }`}
+              placeholder="Add context for participants..."
+              rows="3"
+            />
+          </div>
+
+          {/* Room ID Section */}
+          <div className="bg-slate-700/20 rounded-lg p-4 border border-slate-700/50">
+            <label className="block text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <CheckCircle size={16} className="text-green-400" />
+              Room Code
+            </label>
+            <div className="flex gap-2">
+              <input
+                className="flex-1 px-4 py-3 bg-slate-700/40 text-white rounded-lg border border-slate-600/50 font-mono text-center tracking-widest text-lg"
+                type="text"
+                value={roomId}
+                ref={roomIdRef}
+                readOnly
+              />
+              <button
+                onClick={copyRoomToClipBoard}
+                className={`px-4 py-3 rounded-lg transition-all flex items-center gap-2 font-semibold ${
+                  copied
+                    ? 'bg-green-600/20 text-green-400 border border-green-600/30'
+                    : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700/70 border border-slate-600/50'
+                }`}
+              >
+                <Copy size={18} />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mt-2">Share this code with participants</p>
+          </div>
+
+          {/* Interview Mode Toggle */}
+          <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-lg p-4 border border-purple-700/30 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-slate-300 flex items-center gap-2">
+                <Users size={18} className="text-purple-400" />
+                Interview Mode
+              </p>
+              <p className="text-xs text-slate-500 mt-1">Restrict tab switching & screen access</p>
+            </div>
+            <ToggleButton
+              isToggled={interviewMode}
+              setIsToggled={setInterviewMode}
+            />
+          </div>
+
+        </div>
+
+        {/* Footer */}
+        <div className="px-8 py-6 border-t border-slate-700/30 bg-slate-800/20 space-y-3">
+          <button
+            onClick={handleRoomCreation}
+            disabled={loading || !sessionName.trim()}
+            className={`w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+              loading || !sessionName.trim()
+                ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400'
+                : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20'
+            }`}
+          >
+            {loading ? (
+              <>
+                <Loader size={18} className="animate-spin" />
+                <span>Creating...</span>
+              </>
+            ) : (
+              <>
+                <Plus size={18} />
+                <span>Create Room</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={onClose}
+            className="w-full px-6 py-2 rounded-lg font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+          >
+            Cancel
           </button>
         </div>
-        <label className="block font-open-sans mb-2">Enter Session Name</label>
-        <input
-          className="w-full p-2 mb-3 bg-[#21232f] text-white outline-none rounded-lg"
-          type="text"
-          placeholder="My New Session"
-          value={sessionName}
-          onChange={(e) => setSessionName(e.target.value)}
-        />
-        <label className="block font-open-sans mb-2">
-          Description (optional)
-        </label>
-        <textarea
-          type="text"
-          value={sessionDescription}
-          onChange={(e) => setSessionDescription(e.target.value)}
-          className="w-full p-2 mb-2 bg-[#21232f] text-white  outline-none rounded-lg"
-          placeholder="Description (optional)"
-        ></textarea>
-        <label className="block font-open-sans mb-2">Room ID</label>
-        <div className="flex items-center justify-between">
-          <input
-            className="w-[85%] p-2 mb-3 bg-[#21232f] text-white  outline-none rounded-lg"
-            type="text"
-            value={roomId}
-            ref={roomIdRef}
-            readOnly
-            placeholder="Random Room ID"
-          />
-          <div className="relative group flex items-center justify-center h-10 w-10 rounded-lg p-[1.6px] mb-3 bg-gradient-to-b  from-[#94FFF2] to-[#506DFF] cursor-pointer">
-            <div
-              onClick={copyRoomToClipBoard}
-              className="flex items-center justify-center h-full w-full bg-[#21232f] rounded-[calc(8px-1.2px)]"
-            >
-              <Copy size={20} />
-            </div>
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-sm px-2 py-1 rounded shadow z-10 whitespace-nowrap">
-              Copy
-            </div>
-            {/* Copied message */}
-            {copied && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 group-focus-within:block bg-black text-white text-sm px-2 py-1 rounded shadow z-10 whitespace-nowrap">
-                Copied!
-              </div>
-            )}
-          </div>
-        </div>
-        <label className="block font-open-sans mb-2">Invite People</label>
-        <div className="flex items-center justify-between">
-          <input
-            className="w-[85%] p-2 mb-3 bg-[#21232f] text-white  outline-none rounded-lg"
-            type="email"
-            placeholder="Person's Email Address"
-          />
-          <div className="relative group flex items-center justify-center h-10 w-10 rounded-lg p-[1.6px] mb-3 bg-gradient-to-b  from-[#94FFF2] to-[#506DFF] cursor-pointer">
-            <div className="flex items-center justify-center h-full w-full bg-[#21232f] rounded-[calc(8px-1.2px)]">
-              <UserPlus size={20} />
-            </div>
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-sm px-2 py-1 rounded shadow z-10 whitespace-nowrap">
-              Add
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-lg">Interview Mode</span>
-          <ToggleButton
-            isToggled={interviewMode}
-            setIsToggled={setInterviewMode}
-          />
-        </div>
-        <button
-          onClick={handleRoomCreation}
-          className="p-2 bg-gradient-to-b from-[#94FFF2] to-[#506DFF] cursor-pointer hover:opacity-90 w-full flex rounded-lg items-center justify-center"
-        >
-          {loading ? (
-            <div className="w-5 h-5 border-2 my-0.5 border-white border-t-transparent rounded-full animate-spin items-center justify-center"></div>
-          ) : (
-            "Create Room"
-          )}
-        </button>
+
       </div>
     </div>
   );

@@ -4,7 +4,7 @@
  */
 
 class AudioCaptureService {
-  constructor(onChunkReady, onError) {
+  constructor(onChunkReady, onError, options = {}) {
     this.mediaRecorder = null;
     this.audioContext = null;
     this.analyser = null;
@@ -13,19 +13,35 @@ class AudioCaptureService {
     this.isRecording = false;
     this.onChunkReady = onChunkReady;
     this.onError = onError;
-    this.chunkDuration = 5000; // 5 second chunks
+
+    const configuredChunkDuration = Number.isFinite(options?.chunkDuration)
+      ? options.chunkDuration
+      : null;
+
+    // Gemini free tier rate-limits generateContent aggressively (often ~5 req/min).
+    // Default to longer chunks to avoid 429s during live transcription.
+    this.chunkDuration = configuredChunkDuration ?? 15000;
+    this.mimeType = null;
   }
 
   async initialize(providedStream = null) {
     try {
       if (providedStream) {
-        this.stream = providedStream;
+        const audioTracks = providedStream.getAudioTracks?.() || [];
+        if (!audioTracks.length) {
+          throw new Error('No audio track found in the provided stream');
+        }
+        // Important: record ONLY audio tracks. If the stream also contains video,
+        // forcing an audio-only mimeType can cause MediaRecorder.start() to throw NotSupportedError.
+        // Clone tracks so stopping the recorder doesn't stop the active call.
+        this.stream = new MediaStream(audioTracks.map((t) => t.clone()));
       } else {
         this.stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true,
+            // Hint only; browser may ignore.
             sampleRate: 16000,
           },
         });
@@ -36,10 +52,31 @@ class AudioCaptureService {
       this.analyser = this.audioContext.createAnalyser();
       source.connect(this.analyser);
 
-      this.mediaRecorder = new MediaRecorder(this.stream, {
-        mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 128000,
-      });
+      const candidates = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/ogg;codecs=opus',
+        'audio/ogg',
+      ];
+
+      const pickMimeType = () => {
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return null;
+        for (const type of candidates) {
+          try {
+            if (MediaRecorder.isTypeSupported(type)) return type;
+          } catch (_) {
+            // ignore
+          }
+        }
+        return null;
+      };
+
+      const picked = pickMimeType();
+      const options = { audioBitsPerSecond: 128000 };
+      if (picked) options.mimeType = picked;
+
+      this.mediaRecorder = new MediaRecorder(this.stream, options);
+      this.mimeType = picked || this.mediaRecorder.mimeType || null;
 
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
@@ -51,7 +88,13 @@ class AudioCaptureService {
             const reader = new FileReader();
             reader.onload = () => {
               const audioData = reader.result.split(',')[1];
-              this.onChunkReady?.({ audio: audioData, timestamp: new Date().toISOString(), duration: this.chunkDuration, final: false });
+              this.onChunkReady?.({
+                audio: audioData,
+                mimeType: event.data?.type || this.mediaRecorder?.mimeType || this.mimeType || 'audio/webm',
+                timestamp: new Date().toISOString(),
+                duration: this.chunkDuration,
+                final: false,
+              });
             };
             reader.readAsDataURL(event.data);
           } catch (err) {
@@ -72,11 +115,38 @@ class AudioCaptureService {
   }
 
   start() {
-    if (!this.mediaRecorder) return false;
+    if (!this.mediaRecorder || !this.stream) return false;
+
+    const audioTracks = this.stream.getAudioTracks?.() || [];
+    if (!audioTracks.length || audioTracks.every((t) => t.readyState !== 'live')) {
+      this.onError?.('Microphone is not active. Please allow microphone access and ensure it is not used by another app.');
+      return false;
+    }
+
+    // Resume audio context if it was suspended (common in Chrome until a user gesture)
+    if (this.audioContext?.state === 'suspended') {
+      this.audioContext.resume().catch(() => {});
+    }
+
+    if (this.mediaRecorder.state !== 'inactive') {
+      // Prevent InvalidStateError
+      return false;
+    }
+
     this.isRecording = true;
     this.chunks = [];
-    this.mediaRecorder.start(this.chunkDuration);
-    return true;
+
+    try {
+      this.mediaRecorder.start(this.chunkDuration);
+      return true;
+    } catch (error) {
+      const msg =
+        error?.name === 'NotSupportedError'
+          ? `Recording not supported with current settings. Try a different browser/codec, or ensure you're recording audio-only. (mimeType: ${this.mimeType || 'default'})`
+          : (error?.message || 'Failed to start recording');
+      this.onError?.(msg);
+      return false;
+    }
   }
 
   stop() {
@@ -89,7 +159,7 @@ class AudioCaptureService {
   processChunks() {
     if (this.chunks.length === 0) return;
 
-    const blob = new Blob(this.chunks, { type: 'audio/webm' });
+    const blob = new Blob(this.chunks, { type: this.mediaRecorder?.mimeType || this.mimeType || 'audio/webm' });
     this.chunks = [];
 
     // Convert blob to base64 for transmission
@@ -98,6 +168,7 @@ class AudioCaptureService {
       const audioData = reader.result.split(',')[1]; // Get base64 without data URI
       this.onChunkReady?.({
         audio: audioData,
+        mimeType: blob.type || this.mediaRecorder?.mimeType || this.mimeType || 'audio/webm',
         timestamp: new Date().toISOString(),
         duration: this.chunkDuration,
         final: true,

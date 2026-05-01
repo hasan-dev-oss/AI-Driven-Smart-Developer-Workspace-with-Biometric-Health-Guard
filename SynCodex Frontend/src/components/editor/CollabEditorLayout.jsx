@@ -31,6 +31,7 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
   const [aiOpen, setAiOpen] = useState(false);
   const [localStreamForAI, setLocalStreamForAI] = useState(null);
   const [showInterviewRecorder, setShowInterviewRecorder] = useState(false);
+  const [showVideoPanel, setShowVideoPanel] = useState(true);
 
   // --- Eye Care Timer Integration ---
   const { 
@@ -97,11 +98,6 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
       setAiOpen(true);
       sessionStorage.setItem(aiKey, "1");
     }
-    const interviewKey = `interview_modal_opened_${roomId}`;
-    if (!sessionStorage.getItem(interviewKey)) {
-      setShowInterviewRecorder(true);
-      sessionStorage.setItem(interviewKey, "1");
-    }
   }, [roomId]);
 
   const handlePreviewClick = () => setShowPreview((prev) => !prev);
@@ -159,9 +155,12 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
       />
 
       <EditorNav
-        onRunClick={handleRunClick} 
+        onRunClick={handleRunClick}
         onPreviewClick={handlePreviewClick}
         isHtmlFile={!!isHtmlFile}
+        showVideoPanel={showVideoPanel}
+        onToggleVideoPanel={() => setShowVideoPanel((value) => !value)}
+        onInterviewClick={() => setShowInterviewRecorder(true)}
       />
 
       {/* Main Layout Container - Changed to flex-col to accommodate Performance Monitor footer */}
@@ -239,7 +238,7 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
                   showOutput ? "0" : "3"
                 } pr-2 h-full w-full flex flex-col justify-center`}
                 style={{
-                  width: isInterviewMode ? "100%" : "70%",
+                  width: isInterviewMode || !showVideoPanel ? "100%" : "70%",
                   transition: isInterviewMode ? "none" : "width 0.3s ease",
                 }}
               >
@@ -275,10 +274,10 @@ export default function CollabEditorLayout({ roomId, isInterviewMode }) {
               {/* Video Call Section */}
               <div
                 style={{
-                  width: isInterviewMode ? "auto" : "30%",
+                  width: !showVideoPanel ? 0 : isInterviewMode ? "auto" : "30%",
                   flexShrink: 0,
                   transition: isInterviewMode ? "none" : "width 0.3s ease",
-                  display: 'flex'
+                  display: showVideoPanel ? 'flex' : 'none'
                 }}
               >
                 <div style={{flex: 1}}>
